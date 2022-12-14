@@ -1,0 +1,38 @@
+{
+    "name": "@casa/cli",
+    "description": "home lab automation cli",
+    "type": "module",
+    "version": "0.1.0",
+    "engines": { 
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+
+    },
+    "devDependencies": {
+        "@swc/core": "^1.3.22",
+        "@types/cryptr": "^4.0.1",
+        "@types/dotenv": "^8.2.0",
+        "@types/node": "^18.11.13",
+        "@types/yargs": "^17.0.17",
+        "@types/fs-extra": "^9.0.13",
+        "@types/shelljs": "^0.8.11",
+        "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.1.1",
+        "typescript": "^4.9.4"
+      },
+      "dependencies": {
+
+        "bcrypt": "^5.1.0",
+        "chalk": "^5.2.0",
+        "cryptr": "^6.0.3",
+        "dotenv": "^16.0.3",
+        "dotenv-expand": "^9.0.0",
+        "execa": "^6.1.0",
+        "fs-extra": "^11.1.0",
+        "generate-password": "^1.7.0",
+        "handlebars": "^4.7.7",
+        "shelljs": "^0.8.5",
+        "yargs": "^17.6.2"
+      }
+}

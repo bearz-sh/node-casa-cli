@@ -1,2 +1,3 @@
-# node-casa-cli
-cli for setting up a home lab
+# Casa Cli 🏡 🧪
+
+Cli for setting up a home lab.
