@@ -1,65 +1,12 @@
-import os from 'os';
-import * as shell from 'shelljs';
-import { join } from 'node:path';
+import yargs from "yargs/yargs";
+import { hideBin } from "yargs/helpers";
+import { commands } from "./cmds";
 
-const plat = os.platform();
+const builder = yargs(hideBin(process.argv));
+builder.scriptName("casa");
 
-export const isWindows = plat === 'win32'; 
-export const isDarwin = plat === 'darwin';
+commands.forEach(o => builder.command(o));
 
-export const homeDir = os.homedir();
-export const hostname = os.hostname();
-
-let isUserAdmin : boolean | null = null;
-let isUserRoot : boolean | null = null;
-let isUserElevated : boolean | null = null;
-
-export function testUserIsAdmin() {
-    if(isUserAdmin === null) {
-        isUserAdmin = shell.exec("net session").code === 0;
-    }
-
-    return isUserAdmin;
-}
-
-export function testUserIsRoot() {
-    if(isUserRoot === null) {
-        let uid = -1;
-        if(typeof process !== 'undefined') {
-            // @ts-ignore
-            uid = process.geteuid();
-            if(typeof (uid) === 'undefined') {
-                uid = -1;
-            }
-        }
-
-        isUserRoot = uid === 0
-    }
-
-    return isUserRoot;
-}
-
-export function testUserIsElevated() {
-    if(isUserElevated === null) {
-        isUserElevated = isWindows ? 
-            testUserIsAdmin() :
-            testUserIsRoot(); 
-    }
-
-    return isUserElevated;
-}
-
-let etcFolder = "/etc/casa";
-let homeConfig = join(homeDir, '.config', 'casa');
-let defaultInstallLocation = "/opt/casa"
-
-if(isWindows) {
-    let pd = process.env['ALLUSERSPROFILE'] ?? "C:\\ProgramData";
-    etcFolder = join(pd, "casa", "etc");
-    homeConfig = join(process.env['USERPROFILE'] ?? `${homeDir}\\AppData\\Roaming`, 'casa', 'etc')
-    defaultInstallLocation = join(pd, "casa");
-}
-
-export const casaEtcDir = etcFolder;
-export const casaHomeConfigDir = homeConfig;
-export const casaInstallDir = defaultInstallLocation;
+builder
+.help()
+.argv;

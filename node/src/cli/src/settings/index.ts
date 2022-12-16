@@ -1,9 +1,9 @@
 import { join } from "node:path";
-import { exists, existsAsync, readJson, readJsonAsync, writeJson, writeJsonAsync } from "io/fs";
-import { get, set } from 'util/json-path';
-import { casaDataDir } from "../os/index";
+import { exists, existsAsync, readJson, readJsonAsync, writeJson, writeJsonAsync } from "@app/io/fs";
+import { get, set } from '@app/util/json-path';
+import { CASA_DATA_DIR } from "@app/os";
 
-const location = join(casaDataDir, 'etc', 'casa-settings.json');
+const location = join(CASA_DATA_DIR, 'etc', 'casa-settings.json');
 
 export class Settings {
     #data: { [key: string]: any }

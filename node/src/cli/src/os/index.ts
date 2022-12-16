@@ -81,6 +81,4 @@ export const HOSTNAME = os.hostname();
 export const TMP_DIR = os.tmpdir();
 export const ETC_DIR = etcFolder;
 export const OPT_DIR = optFolder;
-
-export const casaHomeConfigDir = join(HOME_CONFIG_DIR, 'casa');
-export const casaDataDir = process.env['CASA_HOME'] ?? (IS_WINDOWS ? join(dataFolder, 'casa') : join(OPT_DIR, 'casa'));
+export const CASA_DATA_DIR = process.env['CASA_HOME'] ?? (IS_WINDOWS ? join(dataFolder, 'casa') : join(OPT_DIR, 'casa'));

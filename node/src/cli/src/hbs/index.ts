@@ -1,22 +1,28 @@
-import { exists, existsAsync, NEW_LINE, readText, readTextAsync, writeText, writeTextAsync } from 'io/fs'
+import { exists, existsAsync, NEW_LINE, readText, readTextAsync, writeText, writeTextAsync } from '@app/io/fs'
 import hb from 'handlebars'
 import { dirname, join } from 'path';
-import { HOME, IS_WINDOWS, TMP_DIR } from 'os/index';
-import { create, LocalSecretStore } from 'secrets';
+import { HOME, IS_WINDOWS, TMP_DIR } from '@app/os/index';
+import { create } from '@app/secrets';
+import { getSecretValue, setSecretValue, loadAsync } from '@app/env-config';
 
+const config = await loadAsync();
 
-export function expandTemplate(context: any, src: string, dest?: string) {
+export function renderTemplate(context: any, src: string) {
     if (!exists(src)) {
         throw new Error(`File not found: ${src}`);
     }
-
 
     context['__filename'] = src;
     context['__dirname'] = dirname(src);
 
     const template = readText(src);
     const exec = hb.compile(template);
-    const content = exec(context);
+    return exec(context);
+}
+
+export function expandTemplate(context: any, src: string, dest?: string) {
+    
+    let content = renderTemplate(context, src);
 
     if(!dest) {
         dest = src.substring(0, src.length - 4);
@@ -44,6 +50,9 @@ export async function expandTemplateAsync(context: any, src: string, dest?: stri
 
     await writeTextAsync(dest, content, { 'encoding': 'utf8'});
 }
+hb.registerHelper('is-windows', async () => {
+
+});
 
 hb.registerHelper('is-windows', () => {
     return process.platform === 'win32'
@@ -51,6 +60,10 @@ hb.registerHelper('is-windows', () => {
 
 hb.registerHelper('is-darwin', () => {
     return process.platform === 'darwin'
+});
+
+hb.registerHelper("conf", (name: string) => {
+    return new hb.SafeString(config.get(name) || "");
 });
 
 
@@ -91,8 +104,7 @@ hb.registerHelper('new-password', (key : string, length?: string, special?: stri
     } 
 
     let l = 16
-    let store = LocalSecretStore.instance
-    let pw = store.get(key);
+    let pw = getSecretValue(key, process.env["CASA_ENV"]);
     if(pw) {
         return pw;
     }
@@ -118,7 +130,7 @@ hb.registerHelper('new-password', (key : string, length?: string, special?: stri
         special: special
     });
 
-    store.set(key, pw);
+    setSecretValue(key, pw, process.env["CASA_ENV"]);
 
     return pw;
 });
@@ -169,8 +181,7 @@ hb.registerHelper('get-env', (name, defaultValue) => {
     switch(name) {
         case "TMP":
         case "TEMP":
-            return TMP_DIR;
-    }
+            return TMP_DIR;    }
 
     return process.env[name] || defaultValue;
 });

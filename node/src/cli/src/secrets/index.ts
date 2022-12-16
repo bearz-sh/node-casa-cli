@@ -1,9 +1,9 @@
 import { generate } from 'generate-password'
 import { join } from 'path';
-import { casaDataDir, HOSTNAME} from '../os/index';
+import { CASA_DATA_DIR, HOSTNAME} from '@app/os';
 import Cryptr from 'cryptr';
-import { settings } from 'settings';
-import { exists, readJson, writeJson } from 'io/fs';
+import { settings } from '@app/settings';
+import { exists, readJson, writeJson } from '@app/io/fs';
 
 export interface ISecretGenerationOptions {
     length?: number
@@ -32,42 +32,71 @@ export function create(options?: ISecretGenerationOptions) {
     });
 }
 
-let instance : LocalSecretStore | null = null;
 
-export class LocalSecretStore {
+export interface IEncryptor {
+    encrypt(value: string) : string
 
-    #secrets : { [key : string] : string | undefined | null }
-    #file : string;
-    #cryptr : Cryptr;
+    decrypt(value: string) : string 
+}
+
+export class AesGcmEncryptor implements IEncryptor {
+    #cryptr : Cryptr
 
     constructor() {
-        this.#secrets = {};
-        let etcDir = join(casaDataDir, 'etc');
-        this.#file = join(etcDir, "secrets", `${HOSTNAME}.secrets.json`);
-
-        let key = settings.get('secrets.key') as string;
+        let key = process.env["CASA_SECRETS_KEY"]
         
         if(!key) {
+            key = settings.get("secrets.key");
+        }
+
+        if (!key) {
             key = create({ length: 16});
             settings.set("secrets.key", key);
             settings.save();
         }
    
         this.#cryptr = new Cryptr(key);
-        
     }
 
-    static get instance() {
-        if(instance === null)
-            instance = new LocalSecretStore();
-
-        return instance;
+    encrypt(value: string): string {
+        return this.#cryptr.encrypt(value);
     }
 
-    load() {
-        if (exists(this.#file)) {
-            this.#secrets = readJson(this.#file);
+    decrypt(value: string) : string {
+        return this.#cryptr.decrypt(value);
+    }
+}
+
+let decryptor : IEncryptor | null = null;
+
+export function encryptor() : IEncryptor {
+    if (!decryptor) {
+        decryptor = new AesGcmEncryptor();
+    }
+
+    return decryptor;
+}
+
+export class MemorySecretStore {
+    #secrets: { [key: string] : string }
+    #cipher: IEncryptor
+
+    constructor(secrets: ({ [key: string] : string }), encrypted = true, cipher?: IEncryptor) {
+        let local = secrets;
+        cipher ||= encryptor();
+        this.#cipher = cipher;
+
+        if (!encrypted) {
+            for(var key in secrets) {
+                local[key] = this.#cipher.encrypt(secrets[key]); 
+            }
         }
+
+        this.#secrets = local;
+    }
+
+    toJson() {
+        return this.#secrets;
     }
 
     has(key: string) {
@@ -81,11 +110,11 @@ export class LocalSecretStore {
             return null;
         }
         
-        return this.#cryptr.decrypt(value);
+        return this.#cipher.decrypt(value);
     }
 
     set(key: string, secret: string) {
-        this.#secrets[key] = this.#cryptr.encrypt(secret);
-        writeJson(this.#file, this.#secrets);
+        this.#secrets[key] = this.#cipher.encrypt(secret);
     }
 }
+
