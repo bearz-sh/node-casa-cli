@@ -3,6 +3,8 @@ import { exists, existsAsync, readJson, readJsonAsync, writeJson, writeJsonAsync
 import { get, set } from '@app/util/json-path';
 import { CASA_DATA_DIR } from "@app/os";
 
+// this file controls the application settings and not the environment settings.
+
 const location = join(CASA_DATA_DIR, 'etc', 'casa-settings.json');
 
 export class Settings {

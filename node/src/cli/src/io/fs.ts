@@ -10,10 +10,13 @@ import {
     WriteFileOptions, 
     Mode, 
     readdirSync, 
+    rmSync,
+    unlinkSync,
     statSync, 
     mkdirSync as mkdir,
-    copyFileSync as copyFile } from "fs";
-import { access, FileHandle, readFile, writeFile, readdir, stat, mkdir as mkdirAsync, copyFile as copyFileAsync } from 'fs/promises'
+    copyFileSync as copyFile, 
+    RmDirOptions} from "fs";
+import { access, unlink, rm, FileHandle, readFile, writeFile, readdir, stat, mkdir as mkdirAsync, copyFile as copyFileAsync } from 'fs/promises'
 import { ObjectEncodingOptions } from "node:fs";
 import { Stream } from "node:stream";
 import dotenv from 'dotenv';
@@ -60,6 +63,23 @@ export class DirectoryNotFoundError extends IOError {
     }
 }
 
+export async function removeFileAsync(path: PathLike) : Promise<void> {
+    if(await existsAsync(path)) {
+        unlink(path);
+    }
+}
+
+export function removeFile(path: PathLike) {
+    if(exists(path)) {
+        unlinkSync(path);
+    }
+}
+
+export function removeDirectory(path: PathLike, options?: RmDirOptions) {
+    if(exists(path)) {
+        rmSync(path, options);
+    }
+}
 
 export async function existsAsync(path: PathLike, throwError = false) {
     return await  access(path, constants.F_OK)

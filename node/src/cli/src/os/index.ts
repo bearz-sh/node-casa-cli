@@ -6,6 +6,7 @@ const plat = os.platform();
 
 export const IS_WINDOWS = plat === 'win32'; 
 export const IS_DARWIN = plat === 'darwin';
+export const IS_LINUX = plat === 'linux';
 
 let hd = os.homedir();
 let ui = os.userInfo();

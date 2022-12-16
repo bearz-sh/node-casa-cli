@@ -1,5 +1,5 @@
 
-import { getSecretValue } from '@app/env-config';
+import { getSecretValue } from '@app/tasks/env';
 import { purple, error } from '@app/util/colors';
 import chalk from 'chalk';
 import { Argv, Arguments } from 'yargs';

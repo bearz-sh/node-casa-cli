@@ -1,5 +1,5 @@
 
-import { listSecretNames } from '@app/env-config';
+import { listSecretNames } from '@app/tasks/env';
 import { Argv, Arguments } from 'yargs';
 import { purple } from '@app/util/colors';
 export const command = 'list'

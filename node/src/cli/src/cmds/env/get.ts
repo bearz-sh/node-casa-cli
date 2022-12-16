@@ -1,5 +1,5 @@
 
-import { get } from '@app/env-config';
+import { get } from '@app/tasks/env';
 import { Argv, Arguments } from 'yargs';
 
 export const command = 'get'

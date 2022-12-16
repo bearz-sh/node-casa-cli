@@ -1,5 +1,5 @@
 
-import { list } from '@app/env-config';
+import { list } from '@app/tasks/env';
 import { Argv, Arguments } from 'yargs';
 import { purple, success, warning } from '@app/util/colors';
 export const command = 'list'

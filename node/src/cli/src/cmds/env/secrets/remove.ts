@@ -1,5 +1,5 @@
 
-import {  removeSecretValue } from '@app/env-config';
+import {  removeSecretValue } from '@app/tasks/env';
 import { Argv, Arguments } from 'yargs';
 import { success, warning } from '@app/util/colors';
 export const command = 'remove <name>'

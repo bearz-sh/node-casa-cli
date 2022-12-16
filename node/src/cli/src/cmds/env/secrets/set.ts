@@ -1,5 +1,5 @@
 
-import { setSecretValue } from '@app/env-config';
+import { setSecretValue } from '@app/tasks/env';
 import { Argv, Arguments } from 'yargs';
 import { success } from '@app/util/colors';
 export const command = 'set <name> <value>'
